@@ -22,7 +22,28 @@ namespace MeetingCentreService
     {
         public MainWindow()
         {
+            this.Closing += AppClosing;
             InitializeComponent();
+        }
+
+        private void AppClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if(Models.Entities.MeetingCentreService.Current.ServiceChanged)
+            {
+                MessageBoxResult res = MessageBox.Show("You have unsaved changes. Do you want to save these changes before closing?", "Exit Meeting Centre Service", MessageBoxButton.YesNoCancel);
+                switch (res)
+                {
+                    case MessageBoxResult.None:
+                    case MessageBoxResult.Cancel:
+                        e.Cancel = true;
+                        break;
+                    case MessageBoxResult.Yes:
+                        // TODO: Save
+                    default:
+                        e.Cancel = false;
+                        break;
+                }
+            }
         }
 
         private void LoadCentres(object sender, RoutedEventArgs e)
@@ -41,6 +62,11 @@ namespace MeetingCentreService
         {
             (sender as Frame).Navigate(new Views.AccessoriesView());
             (sender as Frame).Loaded -= LoadAccessories;
+        }
+
+        private void ExitApp(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
         }
     }
 }

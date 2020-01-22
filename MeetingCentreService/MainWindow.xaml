@@ -17,7 +17,7 @@
                 <MenuItem Header="Save" />
                 <MenuItem Header="Import" />
                 <Separator />
-                <MenuItem Header="Exit" />
+                <MenuItem Header="Exit" Click="ExitApp" />
             </MenuItem>
         </Menu>
         <TabControl Grid.Row="1" TabStripPlacement="Top">

@@ -47,6 +47,7 @@ namespace MeetingCentreService.Models.Entities
                 centre.PropertyChanged += CentreChanged;
             this.MeetingCentres = new ObservableCollection<MeetingCentre>(import);
             this.MeetingCentres.CollectionChanged += CentresCollectionChanged;
+            this.CentresCollectionChanged(this, new System.Collections.Specialized.NotifyCollectionChangedEventArgs(System.Collections.Specialized.NotifyCollectionChangedAction.Add, this.MeetingCentres));
             this.ServiceChanged = false;
             MeetingCentreService.Current = this;
         }
@@ -59,10 +60,23 @@ namespace MeetingCentreService.Models.Entities
             this.OnPropertyChanged("MeetingCentres");
             if (e.NewItems != null)
                 foreach (MeetingCentre centre in e.NewItems)
+                {
                     centre.PropertyChanged += CentreChanged;
+                    foreach(MeetingRoom room in centre.MeetingRooms)
+                        room.PropertyChanged += RoomChanged;
+                }
             if (e.OldItems != null)
                 foreach (MeetingCentre centre in e.OldItems)
+                {
                     centre.PropertyChanged -= CentreChanged;
+                    foreach (MeetingRoom room in centre.MeetingRooms)
+                        room.PropertyChanged -= RoomChanged;
+                }
+            this.ServiceChanged = true;
+        }
+
+        private void RoomChanged(object sender, PropertyChangedEventArgs e)
+        {
             this.ServiceChanged = true;
         }
 
