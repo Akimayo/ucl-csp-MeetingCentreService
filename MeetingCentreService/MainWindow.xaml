@@ -4,9 +4,32 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MeetingCentreService"
+        xmlns:views="clr-namespace:MeetingCentreService.Views"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="600" Width="800">
     <Grid>
-
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Menu IsMainMenu="True" Grid.Row="0">
+            <MenuItem Header="File">
+                <MenuItem Header="Save" />
+                <MenuItem Header="Import" />
+                <Separator />
+                <MenuItem Header="Exit" />
+            </MenuItem>
+        </Menu>
+        <TabControl Grid.Row="1" TabStripPlacement="Top">
+            <TabItem Header="Meeting Centres and Rooms">
+                <Frame Loaded="LoadCentres" NavigationUIVisibility="Hidden" />
+            </TabItem>
+            <TabItem Header="Meetings Planning">
+                <Frame Loaded="LoadMeetings" NavigationUIVisibility="Hidden" />
+            </TabItem>
+            <TabItem Header="Accessories">
+                <Frame Loaded="LoadAccessories" NavigationUIVisibility="Hidden" />
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

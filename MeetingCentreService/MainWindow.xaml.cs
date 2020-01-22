@@ -24,5 +24,23 @@ namespace MeetingCentreService
         {
             InitializeComponent();
         }
+
+        private void LoadCentres(object sender, RoutedEventArgs e)
+        {
+            (sender as Frame).Navigate(new Views.CentresView());
+            (sender as Frame).Loaded -= LoadCentres;
+        }
+
+        private void LoadMeetings(object sender, RoutedEventArgs e)
+        {
+            (sender as Frame).Navigate(new Views.MeetingsView());
+            (sender as Frame).Loaded -= LoadMeetings;
+        }
+
+        private void LoadAccessories(object sender, RoutedEventArgs e)
+        {
+            (sender as Frame).Navigate(new Views.AccessoriesView());
+            (sender as Frame).Loaded -= LoadAccessories;
+        }
     }
 }
