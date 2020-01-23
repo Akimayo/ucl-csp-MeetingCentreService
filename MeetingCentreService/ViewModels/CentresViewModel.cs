@@ -1,10 +1,8 @@
 ﻿using MeetingCentreService.Models.Entities;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 
 namespace MeetingCentreService.ViewModels
 {
@@ -80,18 +78,9 @@ namespace MeetingCentreService.ViewModels
         /// </summary>
         private CentresViewModel()
         {
-            this._loadService();
             this.PropertyChanged += (s, e) => { // Refresh rooms for when selected centre has changed
                 if (e.PropertyName == "EditCentre") this.ResetRoomsForCurrentCentre();
             };
-        }
-        /// <summary cref="Models.Entities.MeetingCentreService">
-        /// Asynchronously loads a MeetingCentreService
-        /// </summary>
-        private async void _loadService()
-        {
-            new Models.Entities.MeetingCentreService(await Models.Data.CsvImporter.ReadFromFileAsync("D:\\ImportData.csv"));
-            this.OnPropertyChanged("CurrentService");
         }
 
         /// <summary>
@@ -220,6 +209,11 @@ namespace MeetingCentreService.ViewModels
             tuple.Item2 = MeetingCentre.MeetingCentreForm.CollectionAction.Removed;
             this.EditCentre.RoomsChanged.Insert(tupleIndex, tuple);
             this.OnPropertyChanged("ShouldSaveCentre", "EnableCentreControls");
+        }
+
+        internal void RefreshService()
+        {
+            this.OnPropertyChanged("CurrentService");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

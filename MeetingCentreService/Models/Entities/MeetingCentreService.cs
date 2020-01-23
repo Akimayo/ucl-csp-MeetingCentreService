@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using System.Windows;
 using Newtonsoft.Json;
+using System.Xml.Serialization;
 
 namespace MeetingCentreService.Models.Entities
 {
@@ -14,21 +17,69 @@ namespace MeetingCentreService.Models.Entities
         /// Last created MeetingCentreService
         /// </summary>
         [JsonIgnore]
+        [XmlIgnore]
         public static MeetingCentreService Current;
+
+        /// <summary cref="MeetingCentreService">
+        /// Asynchronously loads a MeetingCentreService
+        /// </summary>
+        public static async void LoadService(string loadFrom)
+        {
+            new MeetingCentreService(await Data.CsvImporter.ReadFromFileAsync(loadFrom));
+        }
+        /// <summary cref="MeetingCentreService">
+        /// Asynchronously loads a MeetingCentreService
+        /// </summary>
+        public static async Task<MeetingCentreService> LoadServiceAsync(string loadFrom, Data.DocumentFormat format)
+        {
+            MeetingCentreService service = null;
+            try
+            {
+                switch (format)
+                {
+                    case Data.DocumentFormat.XML:
+                        service = await Data.XmlIO.ParseXmlAsync(loadFrom);
+                        service.FilePath = loadFrom;
+                        break;
+                    case Data.DocumentFormat.JSON:
+                        service = await Data.JsonIO.ParseJsonAsync(loadFrom);
+                        service.FilePath = loadFrom;
+                        break;
+                    case Data.DocumentFormat.CSVStyle:
+                        service = new MeetingCentreService(await Data.CsvImporter.ReadFromFileAsync(loadFrom));
+                        break;
+                    default:
+                        throw new InvalidEnumArgumentException();
+                }
+            }
+            catch (System.IO.IOException e)
+            {
+                MessageBox.Show(e.Message, "Failed opening file", MessageBoxButton.OK);
+            }
+            catch (JsonException e)
+            {
+                MessageBox.Show(e.Message, "Failed importing JSON file", MessageBoxButton.OK);
+            }
+            return service;
+        }
+
         /// <summary>
         /// Save path for current session
         /// </summary>
         [JsonIgnore]
+        [XmlIgnore]
         public string FilePath { get; set; }
         /// <summary>
         /// Indicates whether any changes have been made during this session
         /// </summary>
         [JsonIgnore]
+        [XmlIgnore]
         public bool ServiceChanged { get; private set; }
         /// <summary cref="MeetingCentre">
         /// Collection of MeetingCentres for current session 
         /// </summary>
         [JsonProperty]
+        [XmlArray]
         public ObservableCollection<MeetingCentre> MeetingCentres { get; }
 
         /// <summary>

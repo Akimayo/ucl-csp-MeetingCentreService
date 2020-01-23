@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using Newtonsoft.Json;
+using System.Xml.Serialization;
 
 namespace MeetingCentreService.Models.Entities
 {
@@ -9,44 +10,55 @@ namespace MeetingCentreService.Models.Entities
     public class MeetingRoom : INotifyPropertyChanged
     {
         [JsonIgnore]
+        [XmlIgnore]
         private string _name;
         /// <summary>
         /// Name of the Room
         /// </summary>
         [JsonProperty]
+        [XmlAttribute]
         public string Name { get { return this._name; } set { this._name = value; this.OnPropertyChanged("Name"); } }
         [JsonIgnore]
+        [XmlIgnore]
         private string _code;
         /// <summary>
         /// Identification code of the Room
         /// </summary>
         [JsonProperty]
+        [XmlAttribute]
         public string Code { get { return this._code; } set { this._code = value; this.OnPropertyChanged("Code"); } }
         [JsonIgnore]
+        [XmlIgnore]
         private string _description;
         /// <summary>
         /// Room description
         /// </summary>
         [JsonProperty]
+        [XmlAttribute]
         public string Description { get { return this._description; } set { this._description = value; this.OnPropertyChanged("Description"); } }
         [JsonIgnore]
+        [XmlIgnore]
         private int _capacity;
         /// <summary>
         /// Room's capacity for people
         /// </summary>
         [JsonProperty]
+        [XmlAttribute]
         public int Capacity { get { return this._capacity; } set { this._capacity = value; this.OnPropertyChanged("Capacity"); } }
         [JsonIgnore]
+        [XmlIgnore]
         private bool _videoConference;
         /// <summary>
         /// Whether the Room contains video-conference equipment
         /// </summary>
         [JsonProperty]
+        [XmlAttribute]
         public bool VideoConference { get { return this._videoConference; } set { this._videoConference = value; this.OnPropertyChanged("VideoConference"); } }
         /// <summary>
         /// Meeting Room's Meeting Centre
         /// </summary>
         [JsonIgnore]
+        [XmlIgnore]
         public MeetingCentre MeetingCentre { get; }
 
         /// <summary>
@@ -57,6 +69,11 @@ namespace MeetingCentreService.Models.Entities
         {
             this.MeetingCentre = meetingCentre;
         }
+
+        /// <summary>
+        /// Creates a Room. Used for deserialization.
+        /// </summary>
+        private MeetingRoom() { }
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string propertyName)

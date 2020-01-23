@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:MeetingCentreService"
         xmlns:views="clr-namespace:MeetingCentreService.Views"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800">
+        Title="Meeting Centre Service" Height="600" Width="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -14,8 +14,12 @@
         </Grid.RowDefinitions>
         <Menu IsMainMenu="True" Grid.Row="0">
             <MenuItem Header="File">
-                <MenuItem Header="Save" />
-                <MenuItem Header="Import" />
+                <MenuItem Header="Save" Click="SaveCurrent" />
+                <MenuItem Header="Import">
+                    <MenuItem Header="Legacy CSV" Click="ImportCSV" />
+                    <MenuItem Header="JSON" Click="ImportJSON" />
+                    <MenuItem Header="XML" Click="ImportXML" />
+                </MenuItem>
                 <Separator />
                 <MenuItem Header="Exit" Click="ExitApp" />
             </MenuItem>
