@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Newtonsoft.Json;
 
 namespace MeetingCentreService.Models.Entities
 {
@@ -7,34 +8,45 @@ namespace MeetingCentreService.Models.Entities
     /// </summary>
     public class MeetingRoom : INotifyPropertyChanged
     {
+        [JsonIgnore]
         private string _name;
         /// <summary>
         /// Name of the Room
         /// </summary>
+        [JsonProperty]
         public string Name { get { return this._name; } set { this._name = value; this.OnPropertyChanged("Name"); } }
+        [JsonIgnore]
         private string _code;
         /// <summary>
         /// Identification code of the Room
         /// </summary>
+        [JsonProperty]
         public string Code { get { return this._code; } set { this._code = value; this.OnPropertyChanged("Code"); } }
+        [JsonIgnore]
         private string _description;
         /// <summary>
         /// Room description
         /// </summary>
+        [JsonProperty]
         public string Description { get { return this._description; } set { this._description = value; this.OnPropertyChanged("Description"); } }
+        [JsonIgnore]
         private int _capacity;
         /// <summary>
         /// Room's capacity for people
         /// </summary>
+        [JsonProperty]
         public int Capacity { get { return this._capacity; } set { this._capacity = value; this.OnPropertyChanged("Capacity"); } }
+        [JsonIgnore]
         private bool _videoConference;
         /// <summary>
         /// Whether the Room contains video-conference equipment
         /// </summary>
+        [JsonProperty]
         public bool VideoConference { get { return this._videoConference; } set { this._videoConference = value; this.OnPropertyChanged("VideoConference"); } }
         /// <summary>
         /// Meeting Room's Meeting Centre
         /// </summary>
+        [JsonIgnore]
         public MeetingCentre MeetingCentre { get; }
 
         /// <summary>

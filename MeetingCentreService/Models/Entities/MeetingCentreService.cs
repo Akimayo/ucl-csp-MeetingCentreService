@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Newtonsoft.Json;
 
 namespace MeetingCentreService.Models.Entities
 {
@@ -12,18 +13,22 @@ namespace MeetingCentreService.Models.Entities
         /// <summary cref="MeetingCentreService">
         /// Last created MeetingCentreService
         /// </summary>
+        [JsonIgnore]
         public static MeetingCentreService Current;
         /// <summary>
         /// Save path for current session
         /// </summary>
+        [JsonIgnore]
         public string FilePath { get; set; }
         /// <summary>
         /// Indicates whether any changes have been made during this session
         /// </summary>
+        [JsonIgnore]
         public bool ServiceChanged { get; private set; }
         /// <summary cref="MeetingCentre">
         /// Collection of MeetingCentres for current session 
         /// </summary>
+        [JsonProperty]
         public ObservableCollection<MeetingCentre> MeetingCentres { get; }
 
         /// <summary>

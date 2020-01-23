@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace MeetingCentreService.Models.Entities
 {
@@ -10,24 +11,31 @@ namespace MeetingCentreService.Models.Entities
     /// </summary>
     public class MeetingCentre : INotifyPropertyChanged
     {
+        [JsonIgnore]
         private string _name;
         /// <summary>
         /// Name of thee Centre
         /// </summary>
+        [JsonProperty]
         public string Name { get { return this._name; } set { this._name = value; this.OnPropertyChanged("Name"); } }
+        [JsonIgnore]
         private string _code;
         /// <summary>
         /// Identification code of the Centre
         /// </summary>
+        [JsonProperty]
         public string Code { get { return this._code; } set { this._code = value; this.OnPropertyChanged("Code"); } }
+        [JsonIgnore]
         private string _description;
         /// <summary>
         /// Centre description
         /// </summary>
+        [JsonProperty]
         public string Description { get { return this._description; } set { this._description = value; this.OnPropertyChanged("Description"); } }
         /// <summary>
         /// Collection of Meeting Rooms in the Centre
         /// </summary>
+        [JsonProperty]
         public ObservableCollection<MeetingRoom> MeetingRooms { get; }
 
         /// <summary>
