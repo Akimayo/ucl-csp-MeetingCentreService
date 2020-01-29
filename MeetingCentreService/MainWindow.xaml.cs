@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -11,11 +12,25 @@ namespace MeetingCentreService
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const string SaveResourceKey = "MeetingCentreServiceLastSavedItem";
         public MainWindow()
         {
             this.Closing += AppClosing;
             new Models.Entities.MeetingCentreService();
             InitializeComponent();
+            if(Application.Current.Properties.Contains(SaveResourceKey))
+            {
+                string filePath = Application.Current.Properties[SaveResourceKey] as string;
+                switch(System.IO.Path.GetExtension(filePath))
+                {
+                    case ".xml":
+                        this._import(filePath, Models.Data.DocumentFormat.XML);
+                        break;
+                    case ".json":
+                        this._import(filePath, Models.Data.DocumentFormat.JSON);
+                        break;
+                }
+            }
         }
 
         private void AppClosing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -96,16 +111,32 @@ namespace MeetingCentreService
             }
             if (fileDialog.ShowDialog() == true)
             {
-                Views.Popups.FileProcessingPopup popup = new Views.Popups.FileProcessingPopup(fileDialog.FileName);
-                popup.Show();
-                Models.Entities.MeetingCentreService service = await Models.Entities.MeetingCentreService.LoadServiceAsync(fileDialog.FileName, format);
-                popup.Close();
-                if (service != null) ViewModels.CentresViewModel.Context.RefreshService();
-                else MessageBox.Show("The selected file doesn't exist anymore or is not in the correct format.", "Importing file", MessageBoxButton.OK);
+                await this._import(fileDialog.FileName, format);
             }
         }
 
+        private async Task _import(string fileName, Models.Data.DocumentFormat format)
+        {
+            Views.Popups.FileProcessingPopup popup = new Views.Popups.FileProcessingPopup(fileName);
+            popup.Show();
+            Models.Entities.MeetingCentreService service = await Models.Entities.MeetingCentreService.LoadServiceAsync(fileName, format);
+            popup.Close();
+            if (service != null)
+            {
+                ViewModels.CentresViewModel.Context.RefreshService();
+                ViewModels.MeetingsViewModel.Context.ResetService();
+            }
+            else MessageBox.Show("The selected file doesn't exist anymore or is not in the correct format.", "Importing file", MessageBoxButton.OK);
+        }
+
         private async void SaveCurrent(object sender, EventArgs e)
+        {
+            await this._save(e);
+            if (Application.Current.Properties.Contains(SaveResourceKey)) Application.Current.Properties[SaveResourceKey] = Models.Entities.MeetingCentreService.Current.FilePath;
+            else Application.Current.Properties.Add(SaveResourceKey, Models.Entities.MeetingCentreService.Current.FilePath);
+        }
+
+        private async Task _save(EventArgs e)
         {
             if (Models.Entities.MeetingCentreService.Current.FilePath != null)
             {
@@ -127,6 +158,7 @@ namespace MeetingCentreService
                     MessageBox.Show("An error occured while saving the file", "Saving file", MessageBoxButton.OK);
                     if (e is CancelEventArgs) (e as CancelEventArgs).Cancel = true;
                 }
+                else Models.Entities.MeetingCentreService.Current.Saved();
             }
             else
             {
@@ -134,8 +166,16 @@ namespace MeetingCentreService
                 dialog.Filter = "JSON Save File (*.json)|*.json|XML Save File (*.xml)|*.xml";
                 dialog.ShowDialog();
                 if (dialog.FileName != null) Models.Entities.MeetingCentreService.Current.FilePath = dialog.FileName;
-                this.SaveCurrent(sender, e);
+                await this._save(e);
             }
+        }
+
+        private async void ExportCurrent(object sender, RoutedEventArgs e)
+        {
+            string savePath = Models.Entities.MeetingCentreService.Current.FilePath;
+            Models.Entities.MeetingCentreService.Current.FilePath = null;
+            await this._save(e);
+            Models.Entities.MeetingCentreService.Current.FilePath = savePath;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using MeetingCentreService.Models.Entities;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,7 +20,23 @@ namespace MeetingCentreService.Models.Data
                 using (XmlReader xml = new XmlTextReader(reader))
                 {
                     XmlSerializer ser = new XmlSerializer(typeof(Entities.MeetingCentreService));
-                    return ser.Deserialize(xml) as Entities.MeetingCentreService;
+                    Entities.MeetingCentreService service = ser.Deserialize(xml) as Entities.MeetingCentreService;
+                    // References to parent entities aren't being serialized, thereofre there being added afterwards
+                    foreach (MeetingCentre centre in service.MeetingCentres)
+                    {
+                        foreach (MeetingRoom room in centre.MeetingRooms)
+                        {
+                            room.AssignMeetingCentre(centre);
+                            foreach (KeyValuePair<string, ObservableCollection<MeetingReservation>> reservations in room.Reservations)
+                            {
+                                foreach (MeetingReservation reservation in reservations.Value)
+                                {
+                                    reservation.AssignMeetingRoom(room);
+                                }
+                            }
+                        }
+                    }
+                    return service;
                 }
             });
         }

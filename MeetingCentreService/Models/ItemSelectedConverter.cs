@@ -6,15 +6,12 @@ using System.Windows.Data;
 
 namespace MeetingCentreService.Models
 {
-    class VideoConferenceIconConverter : IValueConverter
+    class ItemSelectedConverter : IValueConverter
     {
-        /// <summary>
-        /// Converts a boolean value to an icon for VideoConference
-        /// </summary>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is bool) return (bool)value ? "\xE720" : "\xF781";
-            else return "\xF141";
+            if (value is int) return (int)value >= 0;
+            else return !(value is null);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

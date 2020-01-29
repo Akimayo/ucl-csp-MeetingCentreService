@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.IO;
+using System.Collections.ObjectModel;
 
 namespace MeetingCentreService.Models.Data
 {
@@ -18,7 +19,23 @@ namespace MeetingCentreService.Models.Data
                 using (StreamReader reader = new StreamReader(loadFrom))
                 using (JsonReader json = new JsonTextReader(reader))
                 {
-                    return serializer.Deserialize<Entities.MeetingCentreService>(json);
+                    Entities.MeetingCentreService service = serializer.Deserialize<Entities.MeetingCentreService>(json);
+                    // References to parent entities aren't being serialized, thereofre there being added afterwards
+                    foreach (MeetingCentre centre in service.MeetingCentres)
+                    {
+                        foreach (MeetingRoom room in centre.MeetingRooms)
+                        {
+                            room.AssignMeetingCentre(centre);
+                            foreach(KeyValuePair<string, ObservableCollection<MeetingReservation>> reservations in room.Reservations)
+                            {
+                                foreach (MeetingReservation reservation in reservations.Value)
+                                {
+                                    reservation.AssignMeetingRoom(room);
+                                }
+                            }
+                        }
+                    }
+                    return service;
                 }
             });
         }

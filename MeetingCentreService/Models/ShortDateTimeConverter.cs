@@ -6,20 +6,19 @@ using System.Windows.Data;
 
 namespace MeetingCentreService.Models
 {
-    class VideoConferenceIconConverter : IValueConverter
+    class ShortDateTimeConverter : IValueConverter
     {
-        /// <summary>
-        /// Converts a boolean value to an icon for VideoConference
-        /// </summary>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is bool) return (bool)value ? "\xE720" : "\xF781";
-            else return "\xF141";
+            if (value is DateTime) return ((DateTime)value).ToShortDateString();
+            else if (value is TimeSpan) return new DateTime().Add((TimeSpan)value).ToShortTimeString();
+            else throw new NotImplementedException();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            if (value is string) return DateTime.Parse(value as string);
+            else throw new NotImplementedException();
         }
     }
 }

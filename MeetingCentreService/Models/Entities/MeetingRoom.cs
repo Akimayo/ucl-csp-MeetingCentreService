@@ -1,6 +1,10 @@
 ﻿using System.ComponentModel;
 using Newtonsoft.Json;
 using System.Xml.Serialization;
+using System.Collections.Generic;
+using NSwag.Collections;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace MeetingCentreService.Models.Entities
 {
@@ -54,12 +58,42 @@ namespace MeetingCentreService.Models.Entities
         [JsonProperty]
         [XmlAttribute]
         public bool VideoConference { get { return this._videoConference; } set { this._videoConference = value; this.OnPropertyChanged("VideoConference"); } }
+        /// <summary cref="MeetingReservation">
+        /// Collection of Meeting Reservations for this Room
+        /// </summary>
+        [JsonProperty]
+        [XmlIgnore]
+        public ObservableDictionary<string, ObservableCollection<MeetingReservation>> Reservations { get; private set; }
+        /// <summary>
+        /// Helper collection for XML serialization and deserialization for Reservations
+        /// </summary>
+        [JsonIgnore]
+        [XmlArray("Reservations")]
+        internal IList<ReservationXMLSerializationContainer> ReservationsXMLHelper
+        {
+            /* 
+             * XML Serializer cannot serialize the Observable Dictionary, so I use this helper mapper to work around it.
+             * For some reason, though, XML Serializer ignores it, both as an IEnumerable and an IList.
+             * I also tried changing the struct to a class, but to no avail.
+             * In Debug Results View, it's exactly what one would expect, but XML's just nope-ing out of it.
+             * So, screw it, it's in JSON.
+             */
+            get
+            {
+                return new List<ReservationXMLSerializationContainer>(this.Reservations.Select(p => new ReservationXMLSerializationContainer() { Date = p.Key, Reservations = p.Value }));
+            }
+            set
+            {
+                this.Reservations = new ObservableDictionary<string, ObservableCollection<MeetingReservation>>();
+                foreach (ReservationXMLSerializationContainer c in value) this.Reservations.Add(c.Date, new ObservableCollection<MeetingReservation>(c.Reservations));
+            }
+        }
         /// <summary>
         /// Meeting Room's Meeting Centre
         /// </summary>
         [JsonIgnore]
         [XmlIgnore]
-        public MeetingCentre MeetingCentre { get; }
+        public MeetingCentre MeetingCentre { get; private set; }
 
         /// <summary>
         /// Creates a Room in a Meeting Centre
@@ -68,18 +102,96 @@ namespace MeetingCentreService.Models.Entities
         public MeetingRoom(MeetingCentre meetingCentre)
         {
             this.MeetingCentre = meetingCentre;
+            this.Reservations = new ObservableDictionary<string, ObservableCollection<MeetingReservation>>();
+            this.Reservations.CollectionChanged += ReservationsDictionaryChanged;
         }
 
         /// <summary>
         /// Creates a Room. Used for deserialization.
         /// </summary>
-        private MeetingRoom() { }
+        private MeetingRoom()
+        {
+            this.Reservations = new ObservableDictionary<string, ObservableCollection<MeetingReservation>>();
+            this.Reservations.CollectionChanged += ReservationsDictionaryChanged;
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string propertyName)
         {
             PropertyChangedEventHandler evt = this.PropertyChanged;
             if (evt != null) evt(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        /// <summary>
+        /// Event handler for changes made to the dictionary of Reservations
+        /// </summary>
+        private void ReservationsDictionaryChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            this.OnPropertyChanged("Reservations");
+            if (e.NewItems != null)
+                foreach (KeyValuePair<string, ObservableCollection<MeetingReservation>> item in e.NewItems)
+                    item.Value.CollectionChanged += ReservationsCollectionChanged;
+            if (e.OldItems != null)
+                foreach (KeyValuePair<string, ObservableCollection<MeetingReservation>> item in e.OldItems)
+                    item.Value.CollectionChanged -= ReservationsCollectionChanged;
+        }
+
+        /// <summary>
+        /// Event handler for changes to the individual collections of Reservations in dictionary
+        /// </summary>
+        private void ReservationsCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            this.OnPropertyChanged("Reservations");
+            if (e.NewItems != null)
+                foreach (MeetingReservation reservation in e.NewItems)
+                    reservation.PropertyChanged += ReservationChanged;
+            if (e.OldItems != null)
+                foreach (MeetingReservation reservation in e.OldItems)
+                    reservation.PropertyChanged -= ReservationChanged;
+        }
+
+        /// <summary>
+        /// Event handler for changes to the individual Reservations
+        /// </summary>
+        /// <remarks>
+        /// Automaticly reassigns the Reservation under the correct key in the dictionary.
+        /// </remarks>
+        private void ReservationChanged(object sender, PropertyChangedEventArgs e)
+        {
+            this.OnPropertyChanged("Reservations");
+            if (e.PropertyName == "Date")
+            {
+                MeetingReservation reservation = sender as MeetingReservation;
+                this.Reservations.First(k => k.Value.Contains(reservation)).Value.Remove(reservation);
+                this.AddReservation(reservation);
+            }
+        }
+
+        /// <summary>
+        /// Adds a Reservation for this room under the correct key.
+        /// </summary>
+        /// <param name="reservation">Added Reservation</param>
+        public void AddReservation(MeetingReservation reservation)
+        {
+            if (reservation.MeetingRoom == this)
+            {
+                string keyDate = reservation.Date.ToShortDateString();
+                if (!this.Reservations.ContainsKey(keyDate))
+                    this.Reservations.Add(keyDate, new ObservableCollection<MeetingReservation>());
+                this.Reservations[keyDate].Add(reservation);
+            }
+            else throw new System.Exception("The Reservation is not for this Room");
+        }
+
+        /// <summary>
+        /// Sets the value of MeetingCentre.
+        /// Used for importing from JSON and XML.
+        /// </summary>
+        /// <param name="centre">Assigning MeetingCentre</param>
+        public void AssignMeetingCentre(MeetingCentre centre)
+        {
+            if (this.MeetingCentre is null) this.MeetingCentre = centre;
+            else throw new System.Exception("Meeting Centre has already been set");
         }
 
         /// <summary>
@@ -204,6 +316,14 @@ namespace MeetingCentreService.Models.Entities
                 PropertyChangedEventHandler evt = this.PropertyChanged;
                 if (evt != null) evt(this, new PropertyChangedEventArgs(propertyName));
             }
+        }
+
+        internal struct ReservationXMLSerializationContainer
+        {
+            [XmlAttribute]
+            internal string Date { get; set; }
+            [XmlArray]
+            internal IEnumerable<MeetingReservation> Reservations { get; set; }
         }
     }
 }

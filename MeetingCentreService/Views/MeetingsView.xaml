@@ -4,11 +4,107 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:MeetingCentreService.Views"
+      xmlns:models="clr-namespace:MeetingCentreService.Models"
+      xmlns:entities="clr-namespace:MeetingCentreService.Models.Entities"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="MeetingsView">
+    <Page.Resources>
+        <models:VideoConferenceIconConverter x:Key="VideoIcon" />
+        <models:ItemSelectedConverter x:Key="IndexBool" />
+        <models:ShortDateTimeConverter x:Key="ShortDateTime" />
+    </Page.Resources>
 
     <Grid Margin="32">
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Row="0" Margin="0,4" Grid.ColumnSpan="4">
+                <TextBlock Text="Meeting Centre" />
+                <ComboBox ItemsSource="{Binding CurrentService.MeetingCentres, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsEditable="False" x:Name="SelectCentre">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type entities:MeetingCentre}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock FontSize="10" Padding="4,0" VerticalAlignment="Center">
+                                    <Run Text="(" />
+                                    <Run Text="{Binding MeetingRooms.Count, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <Run Text=")" />
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Margin="0,4" Grid.ColumnSpan="4">
+                <TextBlock Text="Meeting Room" />
+                <ComboBox ItemsSource="{Binding ElementName=SelectCentre, Path=SelectedItem.MeetingRooms, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedRoom, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEditable="False" x:Name="SelectRoom" IsEnabled="{Binding ElementName=SelectCentre, Path=SelectedIndex, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IndexBool}}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type entities:MeetingRoom}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock FontSize="10" Padding="4,0" VerticalAlignment="Center">
+                                    <Run Text="(" />
+                                    <Run FontFamily="Segoe MDL2 Assets" Text="{Binding VideoConference, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VideoIcon}}" />
+                                    <Run Text=")" />
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+            <StackPanel Grid.Row="2" Margin="0,4" Grid.ColumnSpan="4">
+                <TextBlock Text="Date" />
+                <DatePicker SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+            <ListView Grid.Row="3" Grid.ColumnSpan="4" Margin="0,4" ItemsSource="{Binding ReservationsForCurrentSelection, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding ReservationsForCurrentSelection, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IndexBool}}" x:Name="SelectReservation" SelectedItem="{Binding SelectedReservation, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}">
+                <ListView.ItemTemplate>
+                    <DataTemplate DataType="{x:Type entities:MeetingReservation}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Customer, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock FontSize="12">
+                                <Run Text="{Binding TimeFrom, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <Run Text="-" />
+                                <Run Text="{Binding TimeTo, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Button Grid.Row="4" Grid.Column="0" Content="New" Margin="4,4" IsEnabled="{Binding CanCreateReservation, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Click="NewReservation" />
+            <Button Grid.Row="4" Grid.Column="1" Content="Edit" Margin="4,4" IsEnabled="{Binding CanModifyReservation, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Click="EditReservation" />
+            <Button Grid.Row="4" Grid.Column="3" Content="Delete" Margin="4,4" IsEnabled="{Binding CanModifyReservation, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Click="DeleteReservation" />
+        </Grid>
+        <StackPanel Grid.Column="1" DataContext="{Binding ElementName=SelectReservation, Path=SelectedItem, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Margin="16,0">
+            <TextBlock FontSize="24" Text="{Binding Customer, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBlock FontSize="18">
+                <Run Text="{Binding MeetingRoom.MeetingCentre.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Run FontWeight="Bold" Text="{Binding MeetingRoom.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+            </TextBlock>
+            <TextBlock Margin="0,8">
+                <Run FontFamily="Segoe MDL2 Assets" Text="{Binding VideoConference, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VideoIcon}}" />
+                <Run Text="|" />
+                <Run Text="{Binding Date, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ShortDateTime}}" FontWeight="Bold" />
+                <Run Text="{Binding TimeFrom, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ShortDateTime}}" />
+                <Run Text="-" />
+                <Run Text="{Binding TimeTo, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ShortDateTime}}" />
+            </TextBlock>
+            <TextBlock Text="{Binding Note}" />
+        </StackPanel>
     </Grid>
 </Page>

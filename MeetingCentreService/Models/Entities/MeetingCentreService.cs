@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using System.Windows;
 using Newtonsoft.Json;
 using System.Xml.Serialization;
+using System;
 
 namespace MeetingCentreService.Models.Entities
 {
     /// <summary>
     /// Represents current session of working with MeetingCentres
     /// </summary>
+    [XmlRoot]
     public class MeetingCentreService : INotifyPropertyChanged
     {
         /// <summary cref="MeetingCentreService">
@@ -129,6 +131,14 @@ namespace MeetingCentreService.Models.Entities
                         room.PropertyChanged -= RoomChanged;
                 }
             this.ServiceChanged = true;
+        }
+
+        /// <summary>
+        /// Tells the service that it has been saved.
+        /// </summary>
+        internal void Saved()
+        {
+            this.ServiceChanged = false;
         }
 
         private void RoomChanged(object sender, PropertyChangedEventArgs e)

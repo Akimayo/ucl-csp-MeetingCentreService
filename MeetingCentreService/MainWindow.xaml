@@ -15,6 +15,7 @@
         <Menu IsMainMenu="True" Grid.Row="0">
             <MenuItem Header="File">
                 <MenuItem Header="Save" Click="SaveCurrent" />
+                <MenuItem Header="Export" Click="ExportCurrent" />
                 <MenuItem Header="Import">
                     <MenuItem Header="Legacy CSV" Click="ImportCSV" />
                     <MenuItem Header="JSON" Click="ImportJSON" />
