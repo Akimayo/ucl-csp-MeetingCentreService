@@ -7,6 +7,9 @@ using System.Windows.Media;
 
 namespace MeetingCentreService.Models
 {
+    /// <summary>
+    /// Converts a boolean from Accessory to a Brush for display
+    /// </summary>
     class StockBelowMinimumColorConverter : IValueConverter
     {
         private static readonly SolidColorBrush Red = new SolidColorBrush(Colors.Red);

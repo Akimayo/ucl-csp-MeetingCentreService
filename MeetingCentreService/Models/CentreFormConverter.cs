@@ -6,6 +6,9 @@ using System.Windows.Data;
 
 namespace MeetingCentreService.Models
 {
+    /// <summary>
+    /// Converts between MeetingCentre and MeetingCentreForm
+    /// </summary>
     class CentreFormConverter : IValueConverter
     {
         /// <summary>

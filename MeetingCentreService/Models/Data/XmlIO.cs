@@ -10,16 +10,24 @@ using System.Xml.Serialization;
 
 namespace MeetingCentreService.Models.Data
 {
+    /// <summary>
+    /// Interface for MeetingCentreService XML documents
+    /// </summary>
     public static class XmlIO
     {
+        /// <summary cref="Entities.MeetingCentreService">
+        /// Asynchronously loads a XML MeetingCentreService document
+        /// </summary>
+        /// <param name="loadFrom">Path of loaded XML file</param>
+        /// <returns>Loaded MeetingCentreService</returns>
         internal static Task<Entities.MeetingCentreService> ParseXmlAsync(string loadFrom)
         {
             return Task.Run<Entities.MeetingCentreService>(() =>
             {
+                XmlSerializer ser = new XmlSerializer(typeof(Entities.MeetingCentreService));
                 using (StreamReader reader = new StreamReader(loadFrom))
                 using (XmlReader xml = new XmlTextReader(reader))
                 {
-                    XmlSerializer ser = new XmlSerializer(typeof(Entities.MeetingCentreService));
                     Entities.MeetingCentreService service = ser.Deserialize(xml) as Entities.MeetingCentreService;
                     // References to parent entities aren't being serialized, thereofre there being added afterwards
                     foreach (MeetingCentre centre in service.MeetingCentres)
@@ -41,16 +49,20 @@ namespace MeetingCentreService.Models.Data
             });
         }
 
+        /// <summary>
+        /// Asynchronously exports current MeetingCentreService to its save file path.
+        /// </summary>
+        /// <returns>Boolean indicating success</returns>
         internal static Task<bool> ExportXmlAsync()
         {
             return Task.Run<bool>(() =>
             {
+                XmlSerializer ser = new XmlSerializer(typeof(Entities.MeetingCentreService));
                 using (StreamWriter writer = new StreamWriter(Entities.MeetingCentreService.Current.FilePath))
                 using (XmlWriter xml = new XmlTextWriter(writer))
                 {
                     try
                     {
-                        XmlSerializer ser = new XmlSerializer(typeof(Entities.MeetingCentreService));
                         ser.Serialize(xml, Entities.MeetingCentreService.Current);
                         return true;
                     }

@@ -9,8 +9,16 @@ using System.Collections.ObjectModel;
 
 namespace MeetingCentreService.Models.Data
 {
+    /// <summary>
+    /// Interface for MeetingCentreService JSON documents
+    /// </summary>
     public static class JsonIO
     {
+        /// <summary cref="Entities.MeetingCentreService">
+        /// Asynchronously loads a JSON as a MeetingCentreService
+        /// </summary>
+        /// <param name="loadFrom">Path of loaded JSON file</param>
+        /// <returns>Loaded MeetingCentreService</returns>
         internal static Task<Entities.MeetingCentreService> ParseJsonAsync(string loadFrom)
         {
             return Task.Run<Entities.MeetingCentreService>(() =>
@@ -40,6 +48,10 @@ namespace MeetingCentreService.Models.Data
             });
         }
 
+        /// <summary>
+        /// Asynchronously exports current MeetingCentreService to its save file path.
+        /// </summary>
+        /// <returns>Boolean indicating success</returns>
         internal static Task<bool> ExportJsonAsync()
         {
             return Task.Run<bool>(() =>

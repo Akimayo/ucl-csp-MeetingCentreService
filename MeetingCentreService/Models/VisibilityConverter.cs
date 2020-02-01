@@ -7,6 +7,9 @@ using System.Windows.Data;
 
 namespace MeetingCentreService.Models
 {
+    /// <summary>
+    /// Converts between Boolean and Visibility
+    /// </summary>
     class VisibilityConverter : IValueConverter
     {
         /// <summary>

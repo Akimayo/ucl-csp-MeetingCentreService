@@ -211,6 +211,9 @@ namespace MeetingCentreService.ViewModels
             this.OnPropertyChanged("ShouldSaveCentre", "EnableCentreControls");
         }
 
+        /// <summary>
+        /// Call when a new MeetingCentreService has been opened.
+        /// </summary>
         internal void RefreshService()
         {
             this.OnPropertyChanged("CurrentService");

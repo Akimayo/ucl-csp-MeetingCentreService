@@ -6,6 +6,9 @@ using System.Windows.Data;
 
 namespace MeetingCentreService.Models
 {
+    /// <summary>
+    /// Converts a selected index or item to whether any is selected
+    /// </summary>
     class ItemSelectedConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

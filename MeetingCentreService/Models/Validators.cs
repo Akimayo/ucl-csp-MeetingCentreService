@@ -8,6 +8,9 @@ using System.Windows.Controls;
 
 namespace MeetingCentreService.Models
 {
+    /// <summary>
+    /// Validates that Name is in the correct format
+    /// </summary>
     public class NameValidationRule : ValidationRule
     {
         private static readonly Regex NameFormat = new Regex(@".{2,100}");
@@ -18,6 +21,9 @@ namespace MeetingCentreService.Models
             else return new ValidationResult(false, "Name is incorrect");
         }
     }
+    /// <summary>
+    /// Validates that MeetingCentre or MeetingRoom code is in the correct format
+    /// </summary>
     public class CodeValidationRule : ValidationRule
     {
         private static readonly Regex CodeFormat = new Regex(@"[a-zA-Z0-9\.\-:_]{5,50}");
@@ -28,6 +34,9 @@ namespace MeetingCentreService.Models
             else return new ValidationResult(false, "Code is incorrect");
         }
     }
+    /// <summary>
+    /// Validates that item description is in the correct format
+    /// </summary>
     public class DescriptionaValidationRule : ValidationRule
     {
         private static readonly Regex DescriptionFormat = new Regex(@".{10,300}");
@@ -38,6 +47,9 @@ namespace MeetingCentreService.Models
             else return new ValidationResult(false, "Description is incorrect");
         }
     }
+    /// <summary>
+    /// Validates that MeetingRoom capacity is within bounds
+    /// </summary>
     public class CapacityValidationRule : ValidationRule
     {
         private const int Min = 1, Max = 100;
@@ -50,6 +62,9 @@ namespace MeetingCentreService.Models
             else return new ValidationResult(false, "Capacity exceeds boundaries");
         }
     }
+    /// <summary>
+    /// Validates that customer's name is in the correct format
+    /// </summary>
     public class CustomerValidationRule : ValidationRule
     {
         private static readonly Regex CustomerFormat = new Regex(@".{2,100}");
@@ -60,6 +75,9 @@ namespace MeetingCentreService.Models
             else return new ValidationResult(false, "Customer is invalid");
         }
     }
+    /// <summary>
+    /// Validates that MeetingReservation's note is in the correct format
+    /// </summary>
     public class NoteValidationRule : ValidationRule
     {
         private static readonly Regex NoteFormat = new Regex(@".{0,300}");
@@ -70,6 +88,9 @@ namespace MeetingCentreService.Models
             else return new ValidationResult(false, "Note is incorrect");
         }
     }
+    /// <summary>
+    /// Validates that MeetingReservation's attendance is a positive number
+    /// </summary>
     public class PersonsCountValidationRule : ValidationRule
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
@@ -81,6 +102,9 @@ namespace MeetingCentreService.Models
             else return new ValidationResult(false, "PersonsCount is invalid");
         }
     }
+    /// <summary>
+    /// Validates that Accessory's minimum recommended amount in stock is within bounds
+    /// </summary>
     public class MinimumRecommendedStockValidationRule : ValidationRule
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)

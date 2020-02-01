@@ -127,7 +127,9 @@ namespace MeetingCentreService.Models.Entities
             if (evt != null) evt(this, new PropertyChangedEventArgs(propertyName));
         }
 
-
+        /// <summary>
+        /// Form for editing and creating MeetingReservations
+        /// </summary>
         public class MeetingReservationForm : INotifyPropertyChanged
         {
             /// <summary>
@@ -172,6 +174,9 @@ namespace MeetingCentreService.Models.Entities
             /// Note to or description of the Reservation
             /// </summary>
             public string Note { get { return this._note; } set { this._note = value; this.OnPropertyChanged("Note"); } }
+            /// <summary>
+            /// Calculates whether the reservation is in a time conflict
+            /// </summary>
             public bool IsTimeConflicting
             {
                 get
@@ -225,6 +230,10 @@ namespace MeetingCentreService.Models.Entities
                 return this.Instance;
             }
 
+            /// <summary>
+            /// Returns whether this is a form for an existing MeetingReservation
+            /// </summary>
+            /// <returns>Whether this is an existing MeetingReservation</returns>
             internal bool HasInstance()
             {
                 return this.Instance != null;

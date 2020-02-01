@@ -6,6 +6,9 @@ using System.Windows.Data;
 
 namespace MeetingCentreService.Models
 {
+    /// <summary>
+    /// Converts between DateTime or TimeSpan and string
+    /// </summary>
     class ShortDateTimeConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

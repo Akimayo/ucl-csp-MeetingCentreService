@@ -318,10 +318,19 @@ namespace MeetingCentreService.Models.Entities
             }
         }
 
+        /// <summary>
+        /// Helper structure for serializing reservations dictionary to XML
+        /// </summary>
         internal struct ReservationXMLSerializationContainer
         {
+            /// <summary>
+            /// Dictionary key
+            /// </summary>
             [XmlAttribute]
             internal string Date { get; set; }
+            /// <summary>
+            /// Dictionary value collection
+            /// </summary>
             [XmlArray]
             internal IEnumerable<MeetingReservation> Reservations { get; set; }
         }

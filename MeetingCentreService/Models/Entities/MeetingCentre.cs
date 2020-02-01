@@ -180,7 +180,18 @@ namespace MeetingCentreService.Models.Entities
             /// </summary>
             public enum CollectionAction
             {
-                Removed, Added, Unchanged
+                /// <summary>
+                /// This room has been removed
+                /// </summary>
+                Removed,
+                /// <summary>
+                /// This room has been added
+                /// </summary>
+                Added,
+                /// <summary>
+                /// This room is unchanged
+                /// </summary>
+                Unchanged
             }
         }
     }

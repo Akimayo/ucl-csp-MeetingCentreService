@@ -6,6 +6,9 @@ using System.Windows.Data;
 
 namespace MeetingCentreService.Models
 {
+    /// <summary>
+    /// Neagates a boolean
+    /// </summary>
     class NegateConverter : IValueConverter
     {
         /// <summary>

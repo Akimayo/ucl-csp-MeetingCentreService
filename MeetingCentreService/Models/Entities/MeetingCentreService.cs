@@ -91,6 +91,9 @@ namespace MeetingCentreService.Models.Entities
         [JsonProperty]
         [XmlArray]
         public ObservableCollection<MeetingCentre> MeetingCentres { get; }
+        /// <summary>
+        /// Databse context for the current session
+        /// </summary>
         [JsonIgnore]
         [XmlIgnore]
         public Data.AccessoryContext AccessoriesContext { get; private set; }
@@ -199,6 +202,9 @@ namespace MeetingCentreService.Models.Entities
             this.AccessoriesChanged = false;
         }
 
+        /// <summary>
+        /// Event handler for changes made to MeetingRoom items
+        /// </summary>
         private void RoomChanged(object sender, PropertyChangedEventArgs e)
         {
             this.ServiceChanged = true;

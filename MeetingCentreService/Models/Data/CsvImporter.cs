@@ -26,6 +26,7 @@ namespace MeetingCentreService.Models.Data
                 ReadContentType reading = ReadContentType.None;
                 string line;
                 string[] data;
+                // Parse file line-by-line
                 while((line = await sr.ReadLineAsync()) != null)
                 {
                     data = line.Split(",");
@@ -58,7 +59,19 @@ namespace MeetingCentreService.Models.Data
         /// </remarks>
         private enum ReadContentType
         {
-            None, Centres, Rooms
+            /// <summary>
+            /// No entity type is being imported.
+            /// Either this is the start of the file, or something went wrong.
+            /// </summary>
+            None,
+            /// <summary cref="Entities.MeetingCentre">
+            /// Application is importing MeetingCentres.
+            /// </summary>
+            Centres,
+            /// <summary cref="Entities.MeetingRoom">
+            /// Application is importing MeetingRooms
+            /// </summary>
+            Rooms
         }
     }
 }

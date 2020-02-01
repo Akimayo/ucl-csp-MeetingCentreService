@@ -17,7 +17,14 @@ namespace MeetingCentreService.Views.Popups
     /// </summary>
     public partial class FileSavingPopup : Window
     {
+        /// <summary>
+        /// File basename displayed in the popup
+        /// </summary>
         public string FileBasename { get; }
+        /// <summary>
+        /// Creates a popup for the saved file
+        /// </summary>
+        /// <param name="filePath">Path of the saved file</param>
         public FileSavingPopup(string filePath)
         {
             this.DataContext = this;

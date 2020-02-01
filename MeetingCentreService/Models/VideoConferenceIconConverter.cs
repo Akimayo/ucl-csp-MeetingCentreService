@@ -9,7 +9,7 @@ namespace MeetingCentreService.Models
     class VideoConferenceIconConverter : IValueConverter
     {
         /// <summary>
-        /// Converts a boolean value to an icon for VideoConference
+        /// Converts VideoConference boolean to a corresponding Segoe MDL2 Assets Icon
         /// </summary>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

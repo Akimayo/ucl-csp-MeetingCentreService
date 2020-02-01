@@ -8,6 +8,9 @@ using System.Windows.Data;
 
 namespace MeetingCentreService.Models
 {
+    /// <summary>
+    /// Converts the MeetingCentre's helper structure for MeetingRooms to just the MeetingRoom
+    /// </summary>
     class CentreFormRoomTupleConverter : IValueConverter
     {
         /// <summary>
