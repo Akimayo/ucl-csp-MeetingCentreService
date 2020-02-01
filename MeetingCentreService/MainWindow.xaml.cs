@@ -15,18 +15,21 @@ namespace MeetingCentreService
         private const string SaveResourceKey = "MeetingCentreServiceLastSavedItem";
         public MainWindow()
         {
+            System.Data.Entity.Database.SetInitializer(new Models.Data.AccessoryContext.AccessoriesInitializer());
             this.Closing += AppClosing;
             new Models.Entities.MeetingCentreService();
             InitializeComponent();
-            if(Application.Current.Properties.Contains(SaveResourceKey))
+            if (Application.Current.Properties.Contains(SaveResourceKey))
             {
                 string filePath = Application.Current.Properties[SaveResourceKey] as string;
-                switch(System.IO.Path.GetExtension(filePath))
+                switch (System.IO.Path.GetExtension(filePath))
                 {
                     case ".xml":
+                        // Operates asynchronously, doesn't really matter, makes for a smoother app experience
                         this._import(filePath, Models.Data.DocumentFormat.XML);
                         break;
                     case ".json":
+                        // Operates asynchronously, doesn't really matter, makes for a smoother app experience
                         this._import(filePath, Models.Data.DocumentFormat.JSON);
                         break;
                 }
@@ -35,7 +38,7 @@ namespace MeetingCentreService
 
         private void AppClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (Models.Entities.MeetingCentreService.Current.ServiceChanged)
+            if (Models.Entities.MeetingCentreService.Current.ServiceChanged || Models.Entities.MeetingCentreService.Current.AccessoriesChanged)
             {
                 MessageBoxResult res = MessageBox.Show("You have unsaved changes. Do you want to save these changes before closing?", "Exit Meeting Centre Service", MessageBoxButton.YesNoCancel);
                 switch (res)
@@ -45,13 +48,18 @@ namespace MeetingCentreService
                         e.Cancel = true;
                         break;
                     case MessageBoxResult.Yes:
-                        this.SaveCurrent(sender, e);
+                        if (Models.Entities.MeetingCentreService.Current.ServiceChanged)
+                            this.SaveCurrent(sender, e);
+                        if (Models.Entities.MeetingCentreService.Current.AccessoriesChanged)
+                            Models.Entities.MeetingCentreService.Current.AccessoriesContext.SaveChanges();
                         break;
                     default:
                         e.Cancel = false;
                         break;
                 }
             }
+            // Close database context properly
+            if (!e.Cancel) Models.Entities.MeetingCentreService.Current.AccessoriesContext.Dispose();
         }
 
         private void LoadCentres(object sender, RoutedEventArgs e)
@@ -131,7 +139,13 @@ namespace MeetingCentreService
 
         private async void SaveCurrent(object sender, EventArgs e)
         {
-            await this._save(e);
+            bool ignoreSaveFile = Models.Entities.MeetingCentreService.Current.AccessoriesChanged && !Models.Entities.MeetingCentreService.Current.ServiceChanged;
+            if (Models.Entities.MeetingCentreService.Current.AccessoriesChanged)
+            {
+                await Models.Entities.MeetingCentreService.Current.AccessoriesContext.SaveChangesAsync();
+                Models.Entities.MeetingCentreService.Current.DatabaseSaved();
+            }
+            if (!ignoreSaveFile) await this._save(e);
             if (Application.Current.Properties.Contains(SaveResourceKey)) Application.Current.Properties[SaveResourceKey] = Models.Entities.MeetingCentreService.Current.FilePath;
             else Application.Current.Properties.Add(SaveResourceKey, Models.Entities.MeetingCentreService.Current.FilePath);
         }
@@ -158,7 +172,11 @@ namespace MeetingCentreService
                     MessageBox.Show("An error occured while saving the file", "Saving file", MessageBoxButton.OK);
                     if (e is CancelEventArgs) (e as CancelEventArgs).Cancel = true;
                 }
-                else Models.Entities.MeetingCentreService.Current.Saved();
+                else
+                {
+                    await Models.Entities.MeetingCentreService.Current.AccessoriesContext.SaveChangesAsync();
+                    Models.Entities.MeetingCentreService.Current.DatabaseSaved();
+                }
             }
             else
             {

@@ -13,16 +13,19 @@ namespace MeetingCentreService.Views.Forms
         public CloseAction ClosedWith { get; private set; } = CloseAction.None;
         public bool CanDelete { get { return this.Reservation.HasInstance(); } }
         public string ReservationDateText { get { return this.Reservation.Date.ToLongDateString(); } }
+        public string ReactiveWindowTitle { get; }
         public ReservationForm(Models.Entities.MeetingRoom room, DateTime date)
         {
             this.Reservation = Models.Entities.MeetingReservation.GetNewForm(room, date);
             this.DataContext = this;
+            this.ReactiveWindowTitle = "New Reservation";
             InitializeComponent();
         }
         public ReservationForm(Models.Entities.MeetingReservation reservation)
         {
             this.Reservation = reservation.GetEditForm();
             this.DataContext = this;
+            this.ReactiveWindowTitle = "Edit Reservation";
             InitializeComponent();
         }
 

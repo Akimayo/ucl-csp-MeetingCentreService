@@ -81,4 +81,15 @@ namespace MeetingCentreService.Models
             else return new ValidationResult(false, "PersonsCount is invalid");
         }
     }
+    public class MinimumRecommendedStockValidationRule : ValidationRule
+    {
+        public override ValidationResult Validate(object value, CultureInfo cultureInfo)
+        {
+            if (value is int && (int)value > 0 && (int)value <= 1000)
+                return ValidationResult.ValidResult;
+            else if (value is string && int.TryParse(value as string, out int v) && v > 0 && v <= 1000)
+                return ValidationResult.ValidResult;
+            else return new ValidationResult(false, "MinimumRecommendedStock is out of bounds");
+        }
+    }
 }

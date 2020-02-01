@@ -1,0 +1,55 @@
+﻿<Window x:Class="MeetingCentreService.Views.Forms.AccessoryHandOutForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MeetingCentreService.Views.Forms"
+        xmlns:models="clr-namespace:MeetingCentreService.Models"
+        mc:Ignorable="d"
+        Title="{Binding ReactiveWindowTitle, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Height="200" Width="300">
+    <Grid Margin="32" DataContext="{Binding Accessory, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="3">
+            <Run Text="Hand Out" />
+            <Run Text="{Binding Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+        </TextBlock>
+        <TextBox Grid.Row="1" Grid.ColumnSpan="2" x:Name="FormCount">
+            <TextBox.Text>
+                <Binding Path="HandOut" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <models:MinimumRecommendedStockValidationRule ValidatesOnTargetUpdated="True" />
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
+        <TextBlock Grid.Row="1" Grid.Column="2">
+            <Run Text="/" />
+            <Run Text="{Binding InStock, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+        </TextBlock>
+        <StackPanel Grid.Row="3" Grid.ColumnSpan="3">
+            <TextBlock Text="Customer" />
+            <TextBox x:Name="FormCustomer">
+                <TextBox.Text>
+                    <Binding Path="HandOutTo" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <models:NameValidationRule ValidatesOnTargetUpdated="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+        </StackPanel>
+        <Button Grid.Row="4" Grid.Column="0" Margin="4,4" Padding="16,0" Content="Save" Click="Save" />
+        <Button Grid.Row="4" Grid.Column="2" Margin="4,4" Padding="16,0" Content="Cancel" Click="Cancel" />
+    </Grid>
+</Window>

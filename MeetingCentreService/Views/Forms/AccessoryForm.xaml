@@ -1,0 +1,66 @@
+﻿<Window x:Class="MeetingCentreService.Views.Forms.AccessoryForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MeetingCentreService.Views.Forms"
+        xmlns:models="clr-namespace:MeetingCentreService.Models"
+        xmlns:entities="clr-namespace:MeetingCentreService.Models.Entities"
+        mc:Ignorable="d"
+        Title="{Binding ReactiveWindowTitle}" Height="280" Width="400">
+    <Window.Resources>
+        <models:VisibilityConverter x:Key="Visibility" />
+    </Window.Resources>
+    <Grid Margin="32">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <StackPanel Margin="4,4" Grid.Row="0" Grid.ColumnSpan="4" DataContext="{Binding Accessory, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+            <TextBlock Text="Category" />
+            <ComboBox IsEditable="False" x:Name="FormCategory" ItemsSource="{Binding Categories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type entities:AccessoriesCategory}">
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+        <StackPanel Margin="4,4" Grid.Row="1" Grid.ColumnSpan="4" DataContext="{Binding Accessory, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+            <TextBlock Text="Name" />
+            <TextBox x:Name="FormName">
+                <TextBox.Text>
+                    <Binding Path="Name" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <models:NameValidationRule ValidatesOnTargetUpdated="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+        </StackPanel>
+        <StackPanel Margin="4,4" Grid.Row="2" Grid.ColumnSpan="4" DataContext="{Binding Accessory, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+            <TextBlock Text="Minimum Recommended Stock" />
+            <TextBox x:Name="FormMinimuRecommendedStock">
+                <TextBox.Text>
+                    <Binding Path="RecommendedMinimumStock" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <models:MinimumRecommendedStockValidationRule ValidatesOnTargetUpdated="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+        </StackPanel>
+        <Button Grid.Column="0" Grid.Row="4" Content="Save" Margin="4,4" Padding="16,0" Click="Save" />
+        <Button Grid.Column="2" Grid.Row="4" Visibility="{Binding HasInstance, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource Visibility}}" Content="Delete" Margin="4,4" Padding="16,0" Click="Delete" />
+        <Button Grid.Column="3" Grid.Row="4" Content="Cancel" Margin="4,4" Padding="16,0" Click="Cancel" />
+    </Grid>
+</Window>

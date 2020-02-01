@@ -6,6 +6,8 @@ using System.Windows;
 using Newtonsoft.Json;
 using System.Xml.Serialization;
 using System;
+using System.Linq;
+using System.Data.Entity;
 
 namespace MeetingCentreService.Models.Entities
 {
@@ -77,12 +79,21 @@ namespace MeetingCentreService.Models.Entities
         [JsonIgnore]
         [XmlIgnore]
         public bool ServiceChanged { get; private set; }
+        /// <summary>
+        /// Indicates whether any changes have been made to the Accessories database
+        /// </summary>
+        [JsonIgnore]
+        [XmlIgnore]
+        public bool AccessoriesChanged { get; private set; }
         /// <summary cref="MeetingCentre">
         /// Collection of MeetingCentres for current session 
         /// </summary>
         [JsonProperty]
         [XmlArray]
         public ObservableCollection<MeetingCentre> MeetingCentres { get; }
+        [JsonIgnore]
+        [XmlIgnore]
+        public Data.AccessoryContext AccessoriesContext { get; private set; }
 
         /// <summary>
         /// Create a new session
@@ -93,6 +104,7 @@ namespace MeetingCentreService.Models.Entities
             this.MeetingCentres.CollectionChanged += CentresCollectionChanged;
             this.ServiceChanged = false;
             MeetingCentreService.Current = this;
+            this.LoadFromContext();
         }
 
         /// <summary>
@@ -108,6 +120,45 @@ namespace MeetingCentreService.Models.Entities
             this.CentresCollectionChanged(this, new System.Collections.Specialized.NotifyCollectionChangedEventArgs(System.Collections.Specialized.NotifyCollectionChangedAction.Add, this.MeetingCentres));
             this.ServiceChanged = false;
             MeetingCentreService.Current = this;
+            this.LoadFromContext();
+        }
+
+        /// <summary>
+        /// Loads Categories and Accessories from database context
+        /// and attaches event handlers
+        /// </summary>
+        private void LoadFromContext()
+        {
+            this.AccessoriesContext = new Data.AccessoryContext();
+            this.AccessoriesContext.CategorySet.Load();
+            this.AccessoriesContext.AccessorySet.Include("Category").Load();
+            this.AccessoriesContext.AccessorySet.Local.CollectionChanged += AccessoriesCollectionChanged;
+            foreach(Accessory accessory in this.AccessoriesContext.AccessorySet.Local)
+                accessory.PropertyChanged += this.AccessoryChanged;
+        }
+
+        /// <summary>
+        /// Event handler for changes made to the AccessoriesFromContext and it's items
+        /// </summary>
+        private void AccessoryChanged(object sender, PropertyChangedEventArgs e)
+        {
+            this.OnPropertyChanged("AccessoriesFromContext");
+            this.AccessoriesChanged = true;
+        }
+
+        /// <summary>
+        /// Event handler for changes made to the individual Accessories in AccessoriesFromContext
+        /// </summary>
+        private void AccessoriesCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            this.OnPropertyChanged("AccessoriesFromContext");
+            if (e.NewItems != null)
+                foreach (Accessory accessory in e.NewItems)
+                    accessory.PropertyChanged += this.AccessoryChanged;
+            if (e.OldItems != null)
+                foreach (Accessory accessory in e.OldItems)
+                    accessory.PropertyChanged -= this.AccessoryChanged;
+            this.AccessoriesChanged = true;
         }
 
         /// <summary>
@@ -120,7 +171,7 @@ namespace MeetingCentreService.Models.Entities
                 foreach (MeetingCentre centre in e.NewItems)
                 {
                     centre.PropertyChanged += CentreChanged;
-                    foreach(MeetingRoom room in centre.MeetingRooms)
+                    foreach (MeetingRoom room in centre.MeetingRooms)
                         room.PropertyChanged += RoomChanged;
                 }
             if (e.OldItems != null)
@@ -139,6 +190,13 @@ namespace MeetingCentreService.Models.Entities
         internal void Saved()
         {
             this.ServiceChanged = false;
+        }
+        /// <summary>
+        /// Tells the service that Accessories database has been saved.
+        /// </summary>
+        internal void DatabaseSaved()
+        {
+            this.AccessoriesChanged = false;
         }
 
         private void RoomChanged(object sender, PropertyChangedEventArgs e)
